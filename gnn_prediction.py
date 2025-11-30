@@ -33,12 +33,14 @@ class GCN(nn.Module):
     Graph Convolutional Network (GCN) for Node Classification.
     
     Architecture:
-        - GCNConv layer 1: input_features -> hidden_dim
+        - Linear layer 1: input_features -> hidden_dim (feature transformation)
         - ReLU activation + Dropout
-        - GCNConv layer 2: hidden_dim -> num_classes
+        - GCNConv layer: hidden_dim -> hidden_dim (graph convolution)
+        - ReLU activation + Dropout
+        - Linear layer 2: hidden_dim -> num_classes (classification head)
     
-    The model propagates information from neighbors using the GCNConv layers,
-    allowing nodes to learn representations based on their local graph structure.
+    The model combines linear transformations with GCN convolutions to leverage
+    both node features and graph structure for node classification.
     """
     
     def __init__(self, num_features, hidden_dim, num_classes, dropout=0.5):
@@ -53,14 +55,13 @@ class GCN(nn.Module):
         """
         super(GCN, self).__init__()
         
-        # First GCN layer: input features to hidden dimension
-        self.conv1 = GCNConv(num_features, hidden_dim)
-        
-        # Second GCN layer: hidden dimension to output classes
-        self.conv2 = GCNConv(hidden_dim, num_classes)
-        
-        # Additional linear layers as per requirements
+        # Linear layer for initial feature transformation
         self.linear1 = nn.Linear(num_features, hidden_dim)
+        
+        # GCN layer for graph convolution (aggregates neighbor information)
+        self.conv1 = GCNConv(hidden_dim, hidden_dim)
+        
+        # Linear layer for final classification
         self.linear2 = nn.Linear(hidden_dim, num_classes)
         
         self.dropout = dropout
@@ -76,13 +77,18 @@ class GCN(nn.Module):
         Returns:
             Tensor: Log-softmax probabilities for each class
         """
-        # First GCN convolution + ReLU activation
+        # Initial feature transformation with linear layer
+        x = self.linear1(x)
+        x = F.relu(x)
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        
+        # Graph convolution to aggregate neighbor information
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = F.dropout(x, p=self.dropout, training=self.training)
         
-        # Second GCN convolution
-        x = self.conv2(x, edge_index)
+        # Final classification with linear layer
+        x = self.linear2(x)
         
         return F.log_softmax(x, dim=1)
 

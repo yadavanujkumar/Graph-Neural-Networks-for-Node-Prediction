@@ -96,12 +96,14 @@ GCN (Graph Neural Network)     0.8100
 
 The GCN model consists of:
 
-1. **GCNConv Layer 1**: Input features (1433) → Hidden dimension (16)
+1. **Linear Layer 1**: Input features (1433) → Hidden dimension (16) - Feature transformation
 2. **ReLU Activation** + Dropout (0.5)
-3. **GCNConv Layer 2**: Hidden dimension (16) → Number of classes (7)
-4. **Log-Softmax** output
+3. **GCNConv Layer**: Hidden dimension (16) → Hidden dimension (16) - Graph convolution
+4. **ReLU Activation** + Dropout (0.5)
+5. **Linear Layer 2**: Hidden dimension (16) → Number of classes (7) - Classification head
+6. **Log-Softmax** output
 
-The GCNConv layers propagate information from neighboring nodes, allowing the model to learn representations based on both node features and graph structure.
+The GCNConv layer propagates information from neighboring nodes, while the linear layers handle feature transformation and final classification.
 
 ## Hyperparameters
 
