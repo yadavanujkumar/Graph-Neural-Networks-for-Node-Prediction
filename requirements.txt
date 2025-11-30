@@ -1,0 +1,17 @@
+# Required packages for GNN Node Classification
+# Install with: pip install -r requirements.txt
+
+torch>=1.12.0
+torch-geometric>=2.0.0
+numpy>=1.21.0
+scikit-learn>=1.0.0
+
+# Note: torch-geometric may require additional dependencies.
+# For CPU-only installation, run:
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+#   pip install torch-geometric
+#
+# For CUDA support, first install the appropriate PyTorch version for your CUDA version:
+#   See https://pytorch.org/get-started/locally/ for installation instructions
+#   Then install torch-geometric:
+#   pip install torch-geometric
